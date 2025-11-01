@@ -58,7 +58,7 @@ public class HomeController {
         return "loginHome";
     }
 
-//    @GetMapping("/")
+    //    @GetMapping("/")
     public String homeLoginV3(HttpServletRequest request, Model model) {
 
         // 요청 서블릿에 온 쿠키 중에 해당하는 세션 값이 있는지 확인
@@ -81,14 +81,13 @@ public class HomeController {
     }
 
     /**
-     *
      * @param @SessionAttribute -> 없는 세션 생성 x, 세션중 해당 명의 값이 있는지 찾아줌(스프링이 세션을 쉽게 가져올수 있도록 도와주는 기능)
      * @param model
      * @return
      */
     @GetMapping("/")
     public String homeLoginV3Spring(
-            @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member member,
+            @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member member
             , Model model) {
 
         // 요청 서블릿에 온 쿠키 중에 해당하는 세션 값이 있는지 확인

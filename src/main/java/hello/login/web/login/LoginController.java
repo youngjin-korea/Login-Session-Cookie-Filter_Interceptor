@@ -11,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -82,7 +83,7 @@ public class LoginController {
      * 세션 생성은 HttpServletRequest 에 getSession(true) 으로 HttpSession 생성 이때! 아규먼트로 true면 세션이 존재하면 존재하는거 리턴, 없으면 새로 생성 아규먼트가 false면 세션이 존재하면 리턴, 없으면 null리턴
      * session 에 키, 값을 session.setAttribute(key, value) 하면 JSESSIONID 라는 쿠키 이름에 난수의 값으로 쿠키 세팅되어 응답됨
      */
-    @PostMapping("/login")
+//    @PostMapping("/login")
     public String loginV3(@Valid @ModelAttribute LoginForm form, BindingResult bindingResult, HttpServletRequest request) {
         // 필드 입력 에러시 처리
         if (bindingResult.hasErrors()) {
@@ -104,6 +105,30 @@ public class LoginController {
         session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
 
         return "redirect:/";
+    }
+
+    @PostMapping("/login")
+    public String loginV4(@Valid @ModelAttribute LoginForm form, BindingResult bindingResult, HttpServletRequest request, @RequestParam(defaultValue = "/") String redirectURL) {
+        // 필드 입력 에러시 처리
+        if (bindingResult.hasErrors()) {
+            return "login/loginForm";
+        }
+
+        // 로그인 에러시 처리
+        Member loginMember = loginService.login(form.getLoginId(), form.getPassword());
+        log.info("login 여부: '{}'", loginMember);
+
+        if (loginMember == null) {
+            // ObjectError 글로벌 오류 생성
+            bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다.");
+            return "login/loginForm";
+        }
+
+        // 로그인 성공하고 회원 세션 생성하고, 회원 데이터 보관
+        HttpSession session = request.getSession(true); // true면 세션 없을시 새로 생성
+        session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
+
+        return "redirect:" + redirectURL;
     }
 
     /**
