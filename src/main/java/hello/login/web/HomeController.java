@@ -2,6 +2,7 @@ package hello.login.web;
 
 import hello.login.domain.member.Member;
 import hello.login.domain.member.MemberRepository;
+import hello.login.web.argumentresolver.Login;
 import hello.login.web.session.SessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -85,9 +86,25 @@ public class HomeController {
      * @param model
      * @return
      */
-    @GetMapping("/")
+//    @GetMapping("/")
     public String homeLoginV3Spring(
             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member member
+            , Model model) {
+
+        // 요청 서블릿에 온 쿠키 중에 해당하는 세션 값이 있는지 확인
+        // 세션에 로그인 정보가 없으면 home.html으로 응답
+        if (member == null) {
+            return "home";
+        }
+
+        // 세션에 값이 있는 경우는 모델에 찾은 member 객체 넣어서 loginHome.html로 응답
+        model.addAttribute("member", member);
+        return "loginHome";
+    }
+
+    @GetMapping("/")
+    public String homeLoginAnnotation(
+            @Login Member member
             , Model model) {
 
         // 요청 서블릿에 온 쿠키 중에 해당하는 세션 값이 있는지 확인
